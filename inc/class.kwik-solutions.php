@@ -4,12 +4,14 @@ require_once 'class.kwik-solutions-helpers.php';
 
 class KwikSolutions {
 	static $helpers;
-	const CPT = 'solutions';
+	$taxonomy = 'solution_categories';
+	$cpt = K_SOLUTIONS_CPT;
 
 	public function __construct() {
 
 		add_action( 'init', array( $this, 'solutions_create_post_type' ) );
 		add_shortcode( 'member_table', array( $this, 'member_table' ) );
+		add_filter( 'kwik_left_menu', array( $this, 'solutions_category_links' ) );
 
 		if ( is_admin() ) {
 			$this->admin();
@@ -61,7 +63,7 @@ class KwikSolutions {
 		self::create_solutions_taxonomies();
 
 		register_post_type(
-			'solutions',
+			K_SOLUTIONS_CPT,
 			array(
 				'labels' => array(
 					'name' => __( 'Solutions', 'kwik' ),
@@ -81,7 +83,7 @@ class KwikSolutions {
 				'has_archive' => true,
 				'taxonomies' => array( 'solution_categories' ),
 				'register_meta_box_cb' => array( 'K_SOLUTIONS_META', 'add_solutions_metabox' ),
-				// 'rewrite' => array( 'slug' => 'solutions' ),
+				// 'rewrite' => array( 'slug' => K_SOLUTIONS_CPT ),
 				'query_var' => true,
 			)
 		);
@@ -89,11 +91,15 @@ class KwikSolutions {
 		add_image_size( 'solution_image', 240, 240, false );
 	}
 
+	/**
+	 * Custom taxonomy for solutions
+	 * @return bool [description]
+	 */
 	public function create_solutions_taxonomies() {
 
 		register_taxonomy(
 			'solution_categories',
-			array( 'solutions' ),
+			array( $this->cpt ),
 			array(
 				'hierarchical' => true,
 				'labels' => self::make_labels( 'Category', 'Categories' ),
@@ -103,6 +109,8 @@ class KwikSolutions {
 				'rewrite' => array( 'slug' => 'solutions/category', 'hierarchical' => true),
 			)
 		);
+
+		return true;
 	}
 
 	private static function make_labels( $single, $plural) {
@@ -125,7 +133,7 @@ class KwikSolutions {
 		foreach ( $terms as $term) {
 			$solutions = new WP_Query(
 				array(
-					'post_type' => 'solutions',
+					'post_type' => K_SOLUTIONS_CPT,
 					'posts_per_page' => 50,
 					$term->taxonomy => $term->slug,
 					'order' => 'ASC',
@@ -217,7 +225,7 @@ class KwikSolutions {
 		$inputs = new KwikInputs();
 		$query_args = array(
 			'post_status' => 'publish',
-			'post_type' => 'solutions',
+			'post_type' => K_SOLUTIONS_CPT,
 			'posts_per_page' => 50,
 		);
 
@@ -270,6 +278,38 @@ class KwikSolutions {
 			include_once $inc_filename;
 		}
 	}
+
+
+	public function solutions_category_links($links){
+		$output = $links;
+
+		if ( is_tax( $this->taxonomy ) ) {
+			$output .= $this->get_solutions_category_links();
+		} else if( is_single() && K_SOLUTIONS_CPT === get_post_type() ){
+			$output .= $this->get_solutions_category_links();
+		}
+		return $output;
+	}
+
+	public function get_solutions_category_links(){
+		$output = '';
+		$tax_obj = get_queried_object();
+		$terms = get_terms( $this->taxonomy );
+		if ( ! empty( $terms ) && ! is_wp_error( $terms ) ){
+			foreach ( $terms as $term ) {
+				$term_link = get_term_link( $term );
+				if ( is_single() ){
+					$term_list = wp_get_post_terms( get_the_ID(), $this->taxonomy, array('fields' => 'ids'));
+					$current_item = ( in_array( $term->term_id, $term_list ) ) ? 'current_page_item' : '';
+				} else {
+					$current_item = ( $tax_obj->term_id == $term->term_id) ? 'current_page_item' : '';
+				}
+				$output .= '<li class="'.$current_item.'"><a href="' . esc_url( $term_link ) . '">' . $term->name . '</a></li>';
+			}
+		}
+		return $output;
+	}
+
 
 }// / Class KwikSolutions
 

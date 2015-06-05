@@ -146,8 +146,8 @@ class K_SOLUTIONS_META extends KwikSolutions{
 		);
 
 		// if Kwik Clients is installed, add a field allowing us to link the solution to the client
-		if (defined( 'K_CLIENTS_CPT' )) {
-	        $clients_settings = get_option( K_CLIENTS_SETTINGS );
+		if (defined( 'K_SOLUTIONS_CPT' )) {
+	        $clients_settings = get_option( K_SOLUTIONS_SETTINGS );
 	        $string = preg_replace('/\s+/', '', $clients_settings['name']);
 	        $clients_name = preg_replace('/\s+/', '', $clients_settings['name']);
 		} else {
@@ -161,7 +161,7 @@ class K_SOLUTIONS_META extends KwikSolutions{
 			'value' => null,
 			'attrs' => array(
 				'placeholder' => __("{$clients_name} Name", 'kwik' ),
-				'data-link-to' => K_CLIENTS_CPT,
+				'data-link-to' => K_SOLUTIONS_CPT,
 				)
 		);
 		$solutions_info_fields['company_website'] = array(
@@ -186,7 +186,7 @@ class K_SOLUTIONS_META extends KwikSolutions{
 	// Save the Metabox Data
 	public static function save_solutions_meta($post_id, $post)
 	{
-		if($post->post_status == 'auto-draft' || $post->post_type !== 'solutions' ) return;
+		if($post->post_status == 'auto-draft' || $post->post_type !== K_SOLUTIONS_CPT ) return;
 
 		$meta = new KwikMeta();
 		$meta->save_meta($post, 'solutions_info_fields' );

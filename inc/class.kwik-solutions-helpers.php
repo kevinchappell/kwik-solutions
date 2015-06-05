@@ -48,7 +48,7 @@ class K_SOLUTIONS_HELPERS extends KwikSolutions {
 			'name' => isset($settings['name']) ? $settings['name'] : 'Solution'
 		);
 
-		if (is_admin() && 'solutions' === $typenow) {
+		if (is_admin() && K_SOLUTIONS_CPT === $typenow) {
 			switch ($untranslated_text) {
 
 				case 'Insert into post':
@@ -80,7 +80,7 @@ class K_SOLUTIONS_HELPERS extends KwikSolutions {
 	}
 
 	public static function solutions_at_a_glance() {
-		KwikUtils::cpt_at_a_glance('solutions');
+		KwikUtils::cpt_at_a_glance(K_SOLUTIONS_CPT);
 	}
 
 }
