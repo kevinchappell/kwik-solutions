@@ -4,8 +4,8 @@ require_once 'class.kwik-solutions-helpers.php';
 
 class KwikSolutions {
 	static $helpers;
-	var $taxonomy = 'solution_categories';
-	var $cpt = K_SOLUTIONS_CPT;
+	static $taxonomy = 'solution_categories';
+	static $cpt = K_SOLUTIONS_CPT;
 
 	public function __construct() {
 
