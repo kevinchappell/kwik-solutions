@@ -41,7 +41,7 @@ class Solutions_Table extends WP_Widget {
 		$control_ops = array( 'width' => 150, 'height' => 350, 'id_base' => 'cpt-solutions-widget' );
 
 		/* Create the widget. */
-		$this->WP_Widget( 'cpt-solutions-widget', esc_html__( 'Kwik Solutions Logos', 'kwik' ), $widget_ops, $control_ops );
+		parent::__construct( 'cpt-solutions-widget', esc_html__( 'Kwik Solutions Logos', 'kwik' ), $widget_ops, $control_ops );
 	}
 
 	function add_style($cpr) {
